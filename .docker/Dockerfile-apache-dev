@@ -1,0 +1,23 @@
+FROM php:8.1-apache
+
+WORKDIR /var/www/webs
+# Install & run Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    # Install & enable other needed extensions
+    apt-get update && apt-get install -y libxml2-dev libsodium-dev git zip unzip npm && \
+    EXTENSIONS="gettext soap sodium" && docker-php-ext-install $EXTENSIONS && docker-php-ext-enable $EXTENSIONS && \
+    # Install xdebug for debugging
+    pecl install xdebug && docker-php-ext-enable xdebug && \
+    # Apply and restart apache
+    a2enmod rewrite && service apache2 restart && \
+    # Prepare webs dir (required for correct folder ownership)
+    ROOT="/var/www/webs" && DIRS="$ROOT/node_modules $ROOT/temp $ROOT/vendor" && \
+    mkdir -p $DIRS && chmod -R 0755 $DIRS && chown -R 1000:1000 $DIRS && usermod -u 1000 www-data
+
+# Setup entrypoint
+COPY .docker/entrypoint.sh /var/
+RUN chmod +x /var/entrypoint.sh
+ENTRYPOINT /var/entrypoint.sh
+
+# SIGKILL because of npm run dev
+STOPSIGNAL SIGKILL
