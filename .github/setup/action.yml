@@ -1,0 +1,64 @@
+name: setup
+description: "install needed programs and checkout"
+
+inputs:
+  php-version:
+    description: "php-version"
+    default: "8.1"
+    required: false
+
+  node:
+    description: "set up also node"
+    default: "false"
+    required: false
+  node-build:
+    description: "build assets"
+    default: "false"
+    required: false
+  node-version:
+    description: "node-version"
+    default: "18.x"
+    required: false
+
+  python:
+    description: "set up also python"
+    default: "false"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - run: mkdir app/config/local/ && cd app/config/local/ && cp ../config.local.neon.example vyfuk.neon && cp vyfuk.neon dsef.neon && cp vyfuk.neon fof.neon && cp vyfuk.neon fol.neon && cp vyfuk.neon fykos.neon
+      shell: bash
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: curl, mbstring, mysql, soap, xml
+        tools: composer
+        ini-values: session.gc_probability=0, date.timezone="Europe/Prague", display_startup_errors = Off
+
+    - name: Composer install
+      shell: bash
+      run: composer install --no-progress --prefer-dist
+
+    - name: Use Node.js ${{ inputs.node-version }}
+      if: inputs.node == 'true'
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: NPM clean install
+      if: inputs.node == 'true'
+      shell: bash
+      run: npm ci
+
+    - name: build assets
+      if: inputs.node-build == 'true'
+      shell: bash
+      run: npm run build
+
+    - name: Setup Python
+      if: inputs.python == 'true'
+      uses: actions/setup-python@v4
