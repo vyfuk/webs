@@ -11,7 +11,6 @@ services:
       TZ: 'Europe/Prague'
     volumes:
       - ../../..:/var/www/html # path to webs repository
-    user: 1000:1000 # expects the main user with uid:pid
     extra_hosts:
       - online.fyziklani.cz:127.0.0.1
       - online.fyziklani.org:127.0.0.1
