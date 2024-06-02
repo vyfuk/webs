@@ -1,0 +1,24 @@
+version: '3'
+name: webs
+
+services:
+  webs-test:
+    image: webs-test-getter
+    build:
+      context: . 
+    container_name: webs-test-getter
+    environment:
+      TZ: 'Europe/Prague'
+    volumes:
+      - ../../..:/var/www/html # path to webs repository
+    user: 1000:1000 # expects the main user with uid:pid
+    extra_hosts:
+      - online.fyziklani.cz:127.0.0.1
+      - online.fyziklani.org:127.0.0.1
+      - fyziklani.cz:127.0.0.1
+      - fyziklani.org:127.0.0.1
+      - dsef.cz:127.0.0.1
+      - dsef.org:127.0.0.1
+      - fykos.cz:127.0.0.1
+      - fykos.org:127.0.0.1
+      - vyfuk.org:127.0.0.1

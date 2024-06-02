@@ -1,8 +1,9 @@
-from os.path import join, dirname
-from os import getcwd, makedirs
+from os.path import join, dirname, exists
+from os import getcwd, makedirs, system
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 import requests
+from subprocess import run
 
 netLocs=set()
 
@@ -10,8 +11,8 @@ outDir="temp/DownloadedPages/"
 cacheDir="temp/"
 urls={"http://vyfuk.org", "http://online.fyziklani.cz", "http://online.fyziklani.org", "http://fyziklani.cz", "http://fyziklani.org", "http://dsef.cz", "http://dsef.org", "http://fykos.cz", "http://fykos.org"}
 
-for url in urls:
-    netLocs.add(urlsplit(url).netloc)
+for theurl in urls:
+    netLocs.add(urlsplit(theurl).netloc)
 
 class MyHTMLParser(HTMLParser):
     url:'str'
@@ -30,21 +31,23 @@ class MyHTMLParser(HTMLParser):
                 self.links.add(urljoin(self.url,value))
     def analysePage(self,url):
         req=requests.get(url)
-        if not req.ok:
-            raise Exception('not OK ('+req.status_code+') '+req.reason)
         text=req.text
         self.startNew(req.url)
         if "html" in req.headers.get('Content-Type'):
-            self.feed(text)
             self.validateHTML(text)
+        if not req.ok:
+            raise Exception('not OK ('+str(req.status_code)+') '+req.reason)
+        if "html" in req.headers.get('Content-Type'):
+            self.feed(text)
         return self.links
     
     def validateHTML(self, text):
-        filename=outDir + urlsplit(url).netloc + urlsplit(url).path
+        filename=outDir + urlsplit(self.url).netloc + urlsplit(self.url).path
         if not filename.endswith(".html"):
             filename=filename+".html"
         filename=join(getcwd(),filename)
-        makedirs(dirname(filename))
+        if not exists(dirname(filename)):
+            makedirs(dirname(filename))
             
         f = open(filename, "w")
         f.write(text)
@@ -54,28 +57,47 @@ def mainloop(urls, doneUrls, badUrls):
     for url in urls:
         if not url in doneUrls:
             if urlsplit(url).netloc in netLocs:
+                ourUrls.add(url)
                 try:
                     urls.update(parser.analysePage(url))
                 except:
                     badUrls.add(url)
+            elif urlsplit(url).scheme == "mailto":
+                emails.add(url)
             else:
-                pass
+                otherUrls.add(url)
             doneUrls.add(url)
             return True
     return False
 
 
+otherUrls=set()
 doneUrls=set()
 badUrls=set()
-changetUrls=set()
+ourUrls=set()
+emails=set()
 parser = MyHTMLParser()
 
 while mainloop(urls,doneUrls,badUrls):
     pass
 
-print("\n\n\n\nbad urls\n\n")
-print(badUrls)
-print("\n\n\n\nurls\n\n")
-print(urls)
-print("\n\n\n\nchanged urls\n\n")
-print(changetUrls)
+result=system("java -jar node_modules/vnu-jar/build/dist/vnu.jar " + outDir)
+
+
+print("\n\n\nour urls\n______________________________________________________________")
+for i in sorted(ourUrls):
+    print(i)
+print("\n\nother urls\n______________________________________________________________")
+for i in sorted(otherUrls):
+    print(i)
+print("\n\nemails\n______________________________________________________________")
+for i in emails:
+    print(i)
+print("\n\nbad urls\n______________________________________________________________")
+for i in badUrls:
+    print(i)
+
+
+if len(badUrls)>0:
+    exit(1)
+exit(0)
