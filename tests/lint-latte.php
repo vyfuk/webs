@@ -21,7 +21,7 @@ set_time_limit(0);
 
 
 require __DIR__ . '/../app/Bootstrap.php';
-require __DIR__ . '/../vendor/autoload.php';;
+require __DIR__ . '/../vendor/autoload.php';
 
 $debug = in_array('--debug', $argv, true);
 
@@ -33,7 +33,7 @@ echo '
 $engine = App\Bootstrap::bootVyfuk()->createContainer()->getByType(Nette\Bridges\ApplicationLatte\LatteFactory::class)->create();
 
 if (class_exists(Nette\Bridges\CacheLatte\CacheMacro::class)) {
-    $engine->getCompiler()->addMacro('cache', new Nette\Bridges\CacheLatte\CacheMacro);
+    $engine->getCompiler()->addMacro('cache', new Nette\Bridges\CacheLatte\CacheMacro());
 }
 
 if (class_exists(Nette\Bridges\ApplicationLatte\UIMacros::class)) {

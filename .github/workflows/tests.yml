@@ -96,71 +96,18 @@ jobs:
           level: 5
           path: app/ tests/
 
-  #build-testimage:
-  #  runs-on: ubuntu-latest
-  #  permissions:
-  #    contents: read
-  #    packages: write
-  #  steps:
-  #    - name: Checkout repository
-  #      uses: actions/checkout@v4
-  #    - uses: dorny/paths-filter@v3
-  #      id: filter
-  #      with:
-  #        filters: |
-  #          rebuild:
-  #            - 'tests/getter/docker/**'
-  #    - name: Set up Docker Buildx
-  #      if: steps.filter.outputs.rebuild == 'true'
-  #      uses: docker/setup-buildx-action@v3
-  #    - name: Log in to the Container registry
-  #      if: steps.filter.outputs.rebuild == 'true'
-  #      uses: docker/login-action@v3
-  #      with:
-  #        registry: ${{ env.REGISTRY }}
-  #        username: ${{ github.actor }}
-  #        password: ${{ secrets.GITHUB_TOKEN }}
-  #    - name: Extract metadata (tags, labels) for Docker
-  #      if: steps.filter.outputs.rebuild == 'true'
-  #      id: meta
-  #      uses: docker/metadata-action@v5
-  #      with:
-  #        images: ${{ env.REGISTRY }}/webstestimage
-  #    - name: Build and push Docker image
-  #      if: steps.filter.outputs.rebuild == 'true'
-  #      uses: docker/build-push-action@v5
-  #      with:
-  #        context: docker
-  #        push: true
-  #        tags: ${{ steps.meta.outputs.tags }}
-  #        labels: ${{ steps.meta.outputs.labels }}
-  #        cache-from: type=gha
-  #        cache-to: type=gha,mode=max
-
   test-webserver:
-   # needs: 
-#      - build-testimage
-#      - latte
- #     - build
-  #    - php-stan
+    needs: 
+      - latte
+      - build
+      #- php-stan
     runs-on: ubuntu-latest
-    #container:
-    #  image: ghcr.io/fykosak/webs/webstestimage:master
-    #  options: "--add-host online.fyziklani.cz:127.0.0.1 --add-host online.fyziklani.org:127.0.0.1 --add-host fyziklani.cz:127.0.0.1 --add-host fyziklani.org:127.0.0.1 --add-host dsef.cz:127.0.0.1 --add-host dsef.org:127.0.0.1 --add-host fykos.cz:127.0.0.1 --add-host fykos.org:127.0.0.1 --add-host vyfuk.org:127.0.0.1"
-
-    #defaults:
-    #  run:
-    #    working-directory: /var/www/html
     steps:
       - uses: actions/checkout@v4
         name: Checkout
         with:
           submodules: recursive
       #TODO generate local config
-      #- uses: hoverkraft-tech/compose-action@v2.0.0
-      #  with:
-      #    cwd: "${{ github.workspace }}/tests/getter/docker"
-      #    up-flags: "--exit-code-from webs-test "
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - run: "docker compose up --exit-code-from webs-test"
