@@ -30,7 +30,15 @@ echo '
     ------------
     ';
 
-$engine = App\Bootstrap::bootVyfuk()->createContainer()->getByType(Nette\Bridges\ApplicationLatte\LatteFactory::class)->create();
+
+$tempfile = tempnam(sys_get_temp_dir(), "latte-linter");
+if (file_exists($tempfile)) {
+    unlink($tempfile);
+}
+mkdir($tempfile);
+$engine = App\Bootstrap::bootVyfuk();
+$engine->setTempDirectory($tempfile);
+$engine = $engine->createContainer()->getByType(Nette\Bridges\ApplicationLatte\LatteFactory::class)->create();
 
 if (class_exists(Nette\Bridges\CacheLatte\CacheMacro::class)) {
     $engine->getCompiler()->addMacro('cache', new Nette\Bridges\CacheLatte\CacheMacro());
@@ -45,5 +53,17 @@ if (class_exists(Nette\Bridges\FormsLatte\FormMacros::class)) {
 }
 
 $ok = (new Latte\Tools\Linter($engine, $debug))->scanDirectory(__DIR__ . '/../app/');
+
+function rrmdir($dir)
+{
+    foreach (glob($dir . '/*') as $file) {
+        if (is_dir($file))
+            rrmdir($file);
+        else
+            unlink($file);
+    }
+    rmdir($dir);
+}
+rrmdir($tempfile);
 
 exit($ok ? 0 : 1);
