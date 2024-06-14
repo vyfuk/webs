@@ -42,7 +42,8 @@
     "testCoverage": [
       "@clearTestCache",
       "tests/api/commandWithApi.sh vendor/bin/tester tests -p php --coverage coverage.html --coverage-src app -s -c tests/php.ini -j 8"
-    ]
+    ],
+    "getter": "cd tests/getter/docker && MY_UID=\"$(id -u)\" MY_GID=\"$(id -g)\" docker-compose up --build --exit-code-from webs-test"
   },
   "autoload": {
     "psr-4": {

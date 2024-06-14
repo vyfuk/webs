@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Nette\Configurator;
+use Tracy\Debugger;
 
 class Bootstrap
 {
@@ -16,6 +17,9 @@ class Bootstrap
             $configurator->setDebugMode(true);
         }
         $configurator->enableTracy(__DIR__ . '/../log');
+        if (getenv('NETTE_DEVEL') !== '1') {
+            Debugger::enable(Debugger::Production);
+        }
         error_reporting(~E_USER_DEPRECATED);
         $configurator->setTimeZone('Europe/Prague');
         $configurator->setTempDirectory(__DIR__ . '/../temp/' . $site);

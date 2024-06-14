@@ -17,9 +17,9 @@ done
 
 service apache2 start
 
-composer install --no-progress --prefer-dist
-npm ci
-npm run build
-npm install vnu-jar
-cd /var/www/html
-python3 tests/getter/getAll.py
+composer install --no-progress --prefer-dist &> /dev/null
+npm install --no-save vnu-jar &> /dev/null
+npm run build &> /dev/null
+rm -rf temp/DownloadedPages
+echo -e "_________________________________________________________\nstarting test\n_________________________________________________________"
+python3 tests/getter/getAll.py 2> >(tee log/HTMLlinter.log >&2)

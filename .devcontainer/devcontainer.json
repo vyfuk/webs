@@ -63,7 +63,8 @@
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/git:1": {},
-		"ghcr.io/devcontainers/features/node:1": {}
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker": {}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": ".devcontainer/init.sh",

@@ -11,6 +11,10 @@ services:
       TZ: 'Europe/Prague'
     volumes:
       - ../../..:/var/www/html # path to webs repository
+      # for correct this user
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+    user: ${MY_UID}:${MY_GID}
     extra_hosts:
       - online.fyziklani.cz:127.0.0.1
       - online.fyziklani.org:127.0.0.1

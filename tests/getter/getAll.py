@@ -27,17 +27,16 @@ class MyHTMLParser(HTMLParser):
         self.getUrls(attrs)
     def getUrls(self,attrs):
         for name, value in attrs:
-            if name == "href":
+            if name == "href" or name == "src":
                 self.links.add(urljoin(self.url,value))
     def analysePage(self,url):
         req=requests.get(url)
         text=req.text
         self.startNew(req.url)
-        if "html" in req.headers.get('Content-Type'):
-            self.validateHTML(text)
         if not req.ok:
             raise Exception('not OK ('+str(req.status_code)+') '+req.reason)
         if "html" in req.headers.get('Content-Type'):
+            self.validateHTML(text)
             self.feed(text)
         return self.links
     
@@ -91,10 +90,10 @@ print("\n\nother urls\n_________________________________________________________
 for i in sorted(otherUrls):
     print(i)
 print("\n\nemails\n______________________________________________________________")
-for i in emails:
+for i in sorted(emails):
     print(i)
 print("\n\nbad urls\n______________________________________________________________")
-for i in badUrls:
+for i in sorted(badUrls):
     print(i)
 
 

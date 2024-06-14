@@ -1,7 +1,7 @@
 FROM php:8.1-apache
 
 # install needed packages
-RUN apt update && apt install -y \
+RUN apt-get update && apt-get install -y \
 	gettext \
 	libfreetype-dev \
 	libjpeg62-turbo-dev \
