@@ -1,7 +1,7 @@
 from os.path import join, dirname, exists
 from os import getcwd, makedirs, system
 from html.parser import HTMLParser
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urljoin, urlsplit, quote
 import requests
 from subprocess import run
 
@@ -41,7 +41,7 @@ class MyHTMLParser(HTMLParser):
         return self.links
     
     def validateHTML(self, text):
-        filename=outDir + urlsplit(self.url).netloc + urlsplit(self.url).path
+        filename=outDir + urlsplit(self.url).netloc + urlsplit(self.url).path + quote(''.join(urlsplit(self.url).query), safe='')
         if not filename.endswith(".html"):
             filename=filename+".html"
         filename=join(getcwd(),filename)
